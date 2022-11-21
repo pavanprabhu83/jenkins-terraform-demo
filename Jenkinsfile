@@ -16,64 +16,15 @@ pipeline {
 
 
     stages {
-        stage('Plan') {
-            when {
-                not {
-                    equals expected: true, actual: params.destroy
-                }
-            }
-            
+        stage('checkout') {
             steps {
-                sh 'terraform init -input=false'
-                sh 'terraform workspace select ${environment} || terraform workspace new ${environment}'
-
-                sh "terraform plan --var-file 'env.tfvars' -out tfplan "
-                sh 'terraform show -no-color tfplan > tfplan.txt'
-            }
-        }
-        stage('Approval') {
-           when {
-               not {
-                   equals expected: true, actual: params.autoApprove
-               }
-               not {
-                    equals expected: true, actual: params.destroy
-                }
-           }
-           
-                
-            
-
-           steps {
-               script {
-                    def plan = readFile 'tfplan.txt'
-                    input message: "Do you want to apply the plan?",
-                    parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
-               }
-           }
-       }
-
-        stage('Apply') {
-            when {
-                not {
-                    equals expected: true, actual: params.destroy
+                 script{
+                        dir("Terraform")
+                        {
+                            git "https://github.com/pavanprabhu83/jenkins-terraform-demo.git"
+                        }
+                    }
                 }
             }
-            
-            steps {
-                sh "terraform apply --var-file 'env.tfvars' tfplan"
-            }
-        }
-        
-        stage('Destroy') {
-            when {
-                equals expected: true, actual: params.destroy
-            }
-        
-        steps {
-           sh "terraform destroy --var-file 'env.tfvars' --auto-approve"
-        }
     }
-
-  }
 }
