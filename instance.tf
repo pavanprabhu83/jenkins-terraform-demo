@@ -1,15 +1,15 @@
 resource "aws_instance" "webserver01" {
-    # ami = "ami-062df10d14676e201"
-    ami = var.image_id
+    ami = "ami-062df10d14676e201"
+    # ami = var.image_id
 
     instance_type = "t2.micro"
 
-    tags = var.default_tags
+    # tags = var.default_tags
 
-    # tags = {
-    #     Name = "Pavans Ubuntu Machine"
-    #     email = "123@gmail.com"
-    # }
+    tags = {
+        Name = "Pavans Ubuntu Machine"
+        email = "123@gmail.com"
+    }
     key_name = "ap-south-1-terraform-demo"
     vpc_security_group_ids = [aws_security_group.mysg.id]
 }
