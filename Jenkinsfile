@@ -75,7 +75,9 @@ pipeline {
         }
         stage('Destroy') {
             when {
+                not{
                 equals expected: true, actual: params.destroy
+                }
             }
         
         steps {
